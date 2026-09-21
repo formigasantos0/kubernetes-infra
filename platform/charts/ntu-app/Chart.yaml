@@ -1,0 +1,11 @@
+apiVersion: v2
+
+name: ntu-app
+
+description: Helm Chart padrao da NTU para implantacao de aplicacoes no Kubernetes
+
+type: application
+
+version: 0.1.0
+
+appVersion: "1.0.0"

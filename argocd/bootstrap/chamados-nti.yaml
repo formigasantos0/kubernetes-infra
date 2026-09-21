@@ -1,0 +1,53 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: chamados-nti
+  namespace: argocd
+
+spec:
+  project: ntu-apps
+
+  source:
+    repoURL: https://github.com/formigasantos0/kubernetes-infra.git
+    targetRevision: main
+    path: platform/charts/ntu-app
+
+    helm:
+      releaseName: chamados-nti
+      values: |
+        replicaCount: 2
+
+        image:
+          repository: nginx
+          tag: alpine
+          pullPolicy: IfNotPresent
+
+        service:
+          type: ClusterIP
+          port: 80
+
+        ingress:
+          enabled: true
+          className: nginx
+          annotations:
+            cert-manager.io/cluster-issuer: letsencrypt-production
+          hosts:
+            - host: chamados.ntu.org.br
+              paths:
+                - path: /
+                  pathType: Prefix
+          tls:
+            - secretName: chamados-ntu-tls
+              hosts:
+                - chamados.ntu.org.br
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: chamados-nti
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

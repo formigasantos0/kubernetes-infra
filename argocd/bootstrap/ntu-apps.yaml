@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: ntu-apps
+  namespace: argocd
+
+spec:
+  description: Aplicacoes corporativas da NTU
+
+  sourceRepos:
+    - https://github.com/formigasantos0/kubernetes-infra.git
+
+  destinations:
+    - namespace: chamados-nti
+      server: https://kubernetes.default.svc
+
+  namespaceResourceWhitelist:
+    - group: apps
+      kind: Deployment
+    - group: ""
+      kind: Service
+    - group: networking.k8s.io
+      kind: Ingress
