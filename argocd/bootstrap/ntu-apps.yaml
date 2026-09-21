@@ -19,5 +19,11 @@ spec:
       kind: Deployment
     - group: ""
       kind: Service
+    - group: ""
+      kind: ServiceAccount
     - group: networking.k8s.io
       kind: Ingress
+
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
