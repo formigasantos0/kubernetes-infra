@@ -23,3 +23,13 @@ ingress:
     - secretName: chamados-ntu-tls
       hosts:
         - chamados.ntu.org.br
+affinity:
+  podAntiAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      - labelSelector:
+          matchExpressions:
+            - key: app.kubernetes.io/instance
+              operator: In
+              values:
+                - chamados-nti
+        topologyKey: kubernetes.io/hostname
