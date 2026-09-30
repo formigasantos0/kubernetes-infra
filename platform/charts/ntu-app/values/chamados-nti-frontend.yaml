@@ -1,0 +1,56 @@
+replicaCount: 2
+
+image:
+  repository: cloudlabhost/chamados-nti-frontend
+  tag: v1
+  pullPolicy: IfNotPresent
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: nginx
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+  hosts:
+    - host: chamados.ntu.org.br
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - secretName: chamados-ntu-tls
+      hosts:
+        - chamados.ntu.org.br
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: http
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: http
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 500m
+    memory: 256Mi
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+              - key: app.kubernetes.io/instance
+                operator: In
+                values:
+                  - chamados-nti-frontend
+          topologyKey: kubernetes.io/hostname

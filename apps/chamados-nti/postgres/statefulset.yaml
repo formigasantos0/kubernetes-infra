@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: chamados-postgres
+  namespace: chamados-nti
+
+spec:
+  serviceName: chamados-postgres
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: chamados-postgres
+
+  template:
+    metadata:
+      labels:
+        app: chamados-postgres
+
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:17-alpine
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - name: postgres
+              containerPort: 5432
+
+          env:
+            - name: POSTGRES_DB
+              value: chamados
+
+            - name: POSTGRES_USER
+              value: chamados
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: chamados-postgres-secret
+                  key: POSTGRES_PASSWORD
+
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+
+          readinessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U chamados -d chamados
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          livenessProbe:
+            exec:
+              command:
+                - sh
+                - -c
+                - pg_isready -U chamados -d chamados
+            initialDelaySeconds: 30
+            periodSeconds: 10
+
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: chamados-postgres-data

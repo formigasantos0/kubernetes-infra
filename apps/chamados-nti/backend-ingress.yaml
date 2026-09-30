@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: chamados-nti-backend
+  namespace: chamados-nti
+  annotations:
+    nginx.ingress.kubernetes.io/use-regex: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: chamados.ntu.org.br
+      http:
+        paths:
+          - path: /api(/|$)(.*)
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: chamados-nti-backend-ntu-app
+                port:
+                  number: 8000
+  tls:
+    - hosts:
+        - chamados.ntu.org.br
+      secretName: chamados-ntu-tls

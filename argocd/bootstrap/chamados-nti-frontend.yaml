@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: chamados-nti-frontend
+  namespace: argocd
+spec:
+  project: ntu-apps
+
+  source:
+    repoURL: https://github.com/formigasantos0/kubernetes-infra.git
+    targetRevision: main
+    path: platform/charts/ntu-app
+    helm:
+      releaseName: chamados-nti-frontend
+      valueFiles:
+        - values/chamados-nti-frontend.yaml
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: chamados-nti
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
