@@ -2,7 +2,7 @@ replicaCount: 2
 
 image:
   repository: cloudlabhost/chamados-nti-backend
-  tag: v1
+  tag: v2
   pullPolicy: IfNotPresent
 
 envFrom:
